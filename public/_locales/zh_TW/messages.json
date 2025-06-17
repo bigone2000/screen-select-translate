@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "框選即翻譯",
+    "description": "擴充套件的名稱"
+  },
+  "extDesc": {
+    "message": "輕鬆框選網頁上的任何區域，立即進行 OCR 文字辨識與翻譯為繁體中文。支援圖片、影片、或任何不可選取的文字。",
+    "description": "擴充套件的描述"
+  },
+  "optionsPageTitle": {
+    "message": "設定",
+    "description": "設定頁面的標題"
+  }
+}
