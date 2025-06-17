@@ -20,9 +20,8 @@
 ## 🛠️ 技術棧
 
 - **框架**: [Vue 3](https://vuejs.org/)
-- **建置工具**: [Vite](https://vitejs.dev/)
+- **建置工具**: [Webpack](https://webpack.js.org/)
 - **語言**: [TypeScript](https://www.typescriptlang.org/)
-- **擴充功能框架**: [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - **API**: Google Cloud Vision & Translation API
 
 ## 🚀 安裝與使用
@@ -30,22 +29,22 @@
 ### 1. 取得專案
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/bigone2000/screen-select-translate.git
 cd your-repo-name
 ```
 
 ### 2. 安裝依賴
 
-本專案使用 `pnpm` 作為套件管理器。
+本專案使用 `npm` 作為套件管理器。
 
 ```bash
-pnpm install
+npm install
 ```
 
 ### 3. 建置專案
 
 ```bash
-pnpm build
+npm run build
 ```
 
 這個指令會在專案根目錄下產生一個 `dist` 資料夾。
@@ -63,13 +62,5 @@ pnpm build
 1.  在 Chrome 工具列上，對著「框選即翻譯」的圖示**按右鍵**，然後點擊「**選項**」。
 2.  在開啟的設定頁面中，輸入您的 Google Cloud API 金鑰並儲存。
 3.  **重要**: 請確保您的 Google Cloud 專案已經啟用了 Vision API 和 Translation API。
-
-## 💻 開發
-
-在開發過程中，您可以使用 watch 模式，讓 Vite 自動在您存檔時重新建置：
-
-```bash
-pnpm dev
-```
 
 修改程式碼後，您通常需要在 `chrome://extensions` 頁面點擊「重新載入」按鈕來查看變更。
