@@ -10,5 +10,40 @@
   "optionsTitle": {
     "message": "框選即翻譯 設定",
     "description": "設定頁面的標題。"
+  },
+  "error_noApiKey": {
+    "message": "找不到 API 金鑰，請點選「框選即翻譯」的擴充圖示右鍵，再點選選項，即可進入設定頁面。",
+    "description": "缺少 API 金鑰時的錯誤訊息。"
+  },
+  "error_getCanvasContext": {
+    "message": "無法取得 canvas context",
+    "description": "canvas context 失敗時的錯誤訊息。"
+  },
+  "error_canvasToBlob": {
+    "message": "無法將 Canvas 轉換為 Blob",
+    "description": "canvas 轉換為 blob 失敗時的錯誤訊息。"
+  },
+  "error_captureScreen": {
+    "message": "擷取螢幕畫面失敗。",
+    "description": "擷取螢幕畫面失敗時的錯誤訊息。"
+  },
+  "error_googleApi": {
+    "message": "Google $apiName$ API 錯誤: $statusText$. 回應: $responseText$",
+    "description": "Google API 失敗時的錯誤訊息。",
+    "placeholders": {
+      "apiName": {
+        "content": "$1"
+      },
+      "statusText": {
+        "content": "$2"
+      },
+      "responseText": {
+        "content": "$3"
+      }
+    }
+  },
+  "info_noTextDetected": {
+    "message": "未偵測到任何文字。",
+    "description": "OCR 未找到文字時的提示訊息。"
   }
 }

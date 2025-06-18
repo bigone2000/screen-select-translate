@@ -15,7 +15,8 @@ async function fetchApi<T>(url: string, body: object, apiKey: string): Promise<T
   if (!response.ok || !contentType || !contentType.includes("application/json")) {
     const errorText = await response.text();
     const apiName = new URL(url).hostname.split('.')[0] || 'API';
-    throw new Error(`Google ${apiName} 錯誤: ${response.statusText}. 回應: ${errorText}`);
+    // Google $apiName$ API 錯誤: $statusText$. 回應: $responseText$
+    throw new Error(chrome.i18n.getMessage('error_googleApi', [apiName, response.statusText, errorText]));
   }
   return response.json();
 }

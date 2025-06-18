@@ -10,5 +10,43 @@
   "optionsTitle": {
     "message": "Settings",
     "description": "The title of the options page."
+  },
+  "error_noApiKey": {
+    "message": "API key not found. Please right-click the extension icon, select Options, and set your API key.",
+    "description": "Error message when API key is missing."
+  },
+  "error_getCanvasContext": {
+    "message": "Failed to get canvas context.",
+    "description": "Error message for canvas context failure."
+  },
+  "error_canvasToBlob": {
+    "message": "Failed to convert canvas to Blob.",
+    "description": "Error message for canvas to blob conversion failure."
+  },
+  "error_captureScreen": {
+    "message": "Failed to capture screen.",
+    "description": "Error message for screen capture failure."
+  },
+  "error_googleApi": {
+    "message": "Google $apiName$ API Error: $statusText$. Response: $responseText$",
+    "description": "Error message for Google API failures.",
+    "placeholders": {
+      "apiName": {
+        "content": "$1",
+        "example": "Vision"
+      },
+      "statusText": {
+        "content": "$2",
+        "example": "Bad Request"
+      },
+      "responseText": {
+        "content": "$3",
+        "example": "API key not valid."
+      }
+    }
+  },
+  "info_noTextDetected": {
+    "message": "No text detected.",
+    "description": "Info message when OCR finds no text."
   }
 }

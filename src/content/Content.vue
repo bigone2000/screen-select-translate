@@ -265,10 +265,12 @@ onMounted(async () => {
         error.value = request.error || t('content.error.unknown'); // 發生未知錯誤。
       }
       showResult.value = true;
+      // 這是來自背景的推播訊息，不需要回應，所以不返回 true
     } else if (request.action === 'queryState') {
       sendResponse({ isActive: isReady.value });
+      // 只有在確實需要非同步回應時才返回 true
+      return true;
     }
-    return true;
   });
 
   chrome.storage.sync.get(['fontSize', 'popupPosition'], (result) => {

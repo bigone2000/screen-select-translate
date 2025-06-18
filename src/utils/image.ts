@@ -15,7 +15,8 @@ export async function cropImage(imageDataUrl: string, rect: Rect, devicePixelRat
   const canvas = new OffscreenCanvas(physicalRect.width, physicalRect.height);
   const ctx = canvas.getContext('2d');
   if (!ctx) {
-    throw new Error('無法取得 canvas context');
+    // 無法取得 canvas context
+    throw new Error(chrome.i18n.getMessage('error_getCanvasContext'));
   }
 
   ctx.drawImage(
@@ -26,7 +27,8 @@ export async function cropImage(imageDataUrl: string, rect: Rect, devicePixelRat
 
   const canvasBlob = await canvas.convertToBlob({ type: 'image/png' });
   if (!canvasBlob) {
-    throw new Error('無法將 Canvas 轉換為 Blob');
+    // 無法將 Canvas 轉換為 Blob
+    throw new Error(chrome.i18n.getMessage('error_canvasToBlob'));
   }
 
   return new Promise((resolve, reject) => {

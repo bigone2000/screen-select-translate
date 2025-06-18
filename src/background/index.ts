@@ -18,14 +18,16 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
     const apiKey = await getApiKey();
 
     const fullImageDataUrl = await chrome.tabs.captureVisibleTab({ format: 'png' });
-    if (!fullImageDataUrl) throw new Error('擷取螢幕畫面失敗。');
+    // 擷取螢幕畫面失敗。
+    if (!fullImageDataUrl) throw new Error(chrome.i18n.getMessage('error_captureScreen'));
 
     const croppedImageDataUrl = await cropImage(fullImageDataUrl, request.rect, request.devicePixelRatio);
     const base64content = croppedImageDataUrl.split(',')[1];
 
     const ocrText = await callVisionApi(base64content, apiKey);
     if (!ocrText.trim()) {
-      sendResult({ success: true, ocrText: '', translatedText: '未偵測到任何文字。' });
+      // 未偵測到任何文字。
+      sendResult({ success: true, ocrText: '', translatedText: chrome.i18n.getMessage('info_noTextDetected') });
       return;
     }
 
@@ -43,8 +45,12 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
   }
 }
 
-chrome.runtime.onMessage.addListener((request, sender) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'processImage' && request.rect) {
+    // 呼叫非同步函式來處理圖片，但不在此處等待它完成
     handleProcessImage(request, sender);
+    // 返回 true 來表示我們將會非同步地發送一個（或多個）回應
+    // 在這個案例中，我們是透過 tabs.sendMessage 來「回應」
+    return true;
   }
 });

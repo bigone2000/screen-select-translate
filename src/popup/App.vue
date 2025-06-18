@@ -31,7 +31,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const isActive = ref(false);
 const isUnsupportedPage = ref(false);
 const unsupportedMessage = ref('');
@@ -48,14 +50,14 @@ onMounted(async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.id) {
     isUnsupportedPage.value = true;
-    unsupportedMessage.value = '無法偵測到目前的分頁。';
+    unsupportedMessage.value = t('popup.error.noTab'); // 無法偵測到目前的分頁。
     return;
   }
 
   // 檢查是否為不支援的 URL
   if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('https://chrome.google.com/')) {
     isUnsupportedPage.value = true;
-    unsupportedMessage.value = '此頁面不支援擴充功能。';
+    unsupportedMessage.value = t('popup.error.unsupportedPage'); // 此頁面不支援擴充功能。
     return;
   }
 
@@ -76,23 +78,30 @@ const toggleActivation = async () => {
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.id) {
-    unsupportedMessage.value = '操作失敗，找不到目前的分頁。';
+    unsupportedMessage.value = t('popup.error.noTabOnAction'); // 操作失敗，找不到目前的分頁。
     return;
   }
 
   const newState = !isActive.value;
   const action = newState ? 'activate' : 'deactivate';
 
-  try {
-    // 直接向當前分頁發送啟用/停用指令
-    await chrome.tabs.sendMessage(tab.id, { action });
-    isActive.value = newState;
-  } catch (error) {
-    console.error(`向分頁 ${tab.id} 發送 '${action}' 指令時發生錯誤:`, error);
-    unsupportedMessage.value = '操作失敗，請重新整理頁面後再試。';
-    return;
-  }
+  // 直接向當前分頁發送啟用/停用指令
+  chrome.tabs.sendMessage(tab.id, { action }, () => {
+    // sendMessage 的回呼函式會在訊息發送後執行（無論成功或失敗）
+    // 我們在這裡檢查 lastError，這是處理此類通訊錯誤的標準做法
+    if (chrome.runtime.lastError) {
+      // 如果 lastError 存在，代表 Content Script 不存在或未回應
+      // 我們只更新 UI，不使用 console.error 拋出紅色錯誤
+      console.log(`指令 '${action}' 發送失敗: ${chrome.runtime.lastError.message}`);
+      unsupportedMessage.value = t('popup.error.generic'); // 操作失敗，請重新整理頁面後再試。
+      // 重設狀態，因為操作並未成功
+      isActive.value = !newState;
+    } else {
+      // 訊息成功發送
+      isActive.value = newState;
+      setTimeout(() => window.close(), 150); // 成功後才關閉
+    }
+  });
 
-  setTimeout(() => window.close(), 150); // 稍微延長關閉時間以顯示按鈕狀態變化
 };
 </script>
