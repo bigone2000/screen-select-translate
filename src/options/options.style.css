@@ -100,6 +100,93 @@
   padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
 }
 
+/* --- Custom Select --- */
+.custom-select {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-family);
+}
+
+.custom-select__trigger {
+  display: flex;
+  align-items: center;
+  padding: calc(var(--spacing-unit) * 1.5) var(--spacing-unit);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius);
+  background-color: var(--color-background);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-select__trigger:hover, .custom-select__trigger.open {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.custom-select__arrow {
+  margin-left: auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--color-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.custom-select__arrow.open {
+  transform: rotate(180deg);
+}
+
+.custom-select__options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-dp4);
+  list-style: none;
+  padding: var(--spacing-unit) 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.custom-select__option {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.custom-select__option:hover {
+  background-color: var(--color-background);
+}
+
+.custom-select__option.selected {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 500;
+}
+
+.flag-icon {
+  width: 20px;
+  height: 15px;
+  margin-right: calc(var(--spacing-unit) * 1.5);
+  border: 1px solid var(--color-divider);
+  object-fit: cover;
+}
+
+.flag-icon-placeholder {
+  width: 20px;
+  height: 15px;
+  margin-right: calc(var(--spacing-unit) * 1.5);
+  background-color: var(--color-divider);
+}
+
 .status-footer {
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
   border-top: 1px solid var(--color-divider);

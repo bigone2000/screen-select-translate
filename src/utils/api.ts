@@ -31,8 +31,8 @@ export async function callVisionApi(base64content: string, apiKey: string): Prom
   return data.responses[0]?.fullTextAnnotation?.text || '';
 }
 
-export async function callTranslateApi(text: string, apiKey: string): Promise<string> {
-  const payload = { q: text, target: 'zh-TW' };
+export async function callTranslateApi(text: string, apiKey: string, targetLanguage: string): Promise<string> {
+  const payload = { q: text, target: targetLanguage };
   const data = await fetchApi<TranslateResponse>(TRANSLATE_API_URL, payload, apiKey);
   return data.data.translations[0].translatedText;
 }

@@ -29,7 +29,11 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
       return;
     }
 
-    const translatedText = await callTranslateApi(ocrText, apiKey);
+    // 從儲存空間獲取目標語言，若無則使用預設值
+    const storageResult = await chrome.storage.sync.get('targetLanguage');
+    const targetLanguage = storageResult.targetLanguage || 'zh-TW';
+
+    const translatedText = await callTranslateApi(ocrText, apiKey, targetLanguage);
 
     sendResult({ success: true, ocrText, translatedText });
 
