@@ -1,97 +1,101 @@
-# 框選即翻譯 (Screen-Select-Translate)
+# Screen-Select-Translate
 
-這是一個 Chrome 瀏覽器擴充套件，讓使用者可以輕鬆框選網頁上的任何區域，並立即對選取範圍內的文字進行 OCR 辨識與翻譯。它特別適用於翻譯圖片、影片、Canvas 或任何無法直接選取複製的網頁內容。
+[English](./README.md) | [繁體中文](./README.zh-TW.md)
 
-## ✨ 主要功能
+This is a Chrome browser extension that allows users to easily select any area on a webpage and instantly perform OCR recognition and translation on the text within the selected area. It is particularly useful for translating text from images, videos, Canvas, or any web content that cannot be directly selected and copied.
 
-- **任意區域框選**：在任何網頁上，點擊擴充功能圖示即可啟動，然後拖曳滑鼠選取您想翻譯的區域。
-- **OCR 文字辨識**：使用 Google Cloud Vision API 進行高準確度的光學字元辨識。
-- **即時翻譯**：使用 Google Cloud Translation API 將辨識出的文字翻譯成繁體中文。
-- **可拖曳的結果視窗**：翻譯結果會顯示在一個可自由拖曳的彈出視窗中，方便您對照原文。
-- **手風琴式結果顯示**：原文與譯文採手風琴效果呈現，預設顯示譯文，讓介面更簡潔。
-- **高度自訂化**：
-  - **API 金鑰設定**：直接在擴充功能的設定頁面中，安全地儲存您的 Google Cloud API 金鑰。
-  - **彈出位置**：可設定結果視窗預設出現在選取範圍的上、下、左、右方。
-  - **字體大小**：可自由調整結果文字的字體大小。
-  - **動態寬度**：結果視窗的寬度會根據您的選取範圍自動調整。
-- **狀態持續性**：即使重整頁面，擴充功能的啟用狀態也會被保留。
-- **國際化 (i18n)**：擴充套件介面支援多國語言（目前為繁體中文）。
+## ✨ Key Features
 
-## 🛠️ 技術棧
+- **Select Any Area**: Activate the extension by clicking its icon on any webpage, then drag your mouse to select the area you want to translate.
+- **OCR Text Recognition**: Utilizes the Google Cloud Vision API for high-accuracy optical character recognition.
+- **Real-time Translation**: Uses the Google Cloud Translation API to translate the recognized text.
+- **Draggable Result Window**: The translation result is displayed in a freely draggable pop-up window for easy comparison with the original text.
+- **Accordion-style Display**: The original and translated texts are presented in an accordion style, with the translation shown by default for a cleaner interface.
+- **Highly Customizable**:
+  - **API Key Setup**: Securely store your Google Cloud API key directly in the extension's options page.
+  - **Popup Position**: Set the default position of the result window to appear above, below, left, or right of the selection.
+  - **Font Size**: Freely adjust the font size of the result text.
+  - **Dynamic Width**: The width of the result window automatically adjusts based on your selection.
+  - **Target Language**: Choose your desired translation target language from a comprehensive list.
+- **State Persistence**: The activation state of the extension is preserved even after a page reload.
+- **Internationalization (i18n)**: The extension interface supports multiple languages (currently Traditional Chinese and English).
 
-- **框架**: [Vue 3](https://vuejs.org/)
-- **建置工具**: [Webpack](https://webpack.js.org/)
-- **語言**: [TypeScript](https://www.typescriptlang.org/)
-- **API**: Google Cloud Vision & Translation API
+## 🛠️ Tech Stack
 
-## 🚀 安裝與使用
+- **Framework**: [Vue 3](https://vuejs.org/)
+- **Build Tool**: [Webpack](https://webpack.js.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **APIs**: Google Cloud Vision & Translation API
 
-### 1. 取得專案
+## 🚀 Installation and Usage
+
+### 1. Get the Project
 
 ```bash
 git clone https://github.com/bigone2000/screen-select-translate.git
-cd your-repo-name
+cd screen-select-translate
 ```
 
-### 2. 安裝依賴
+### 2. Install Dependencies
 
-本專案使用 `npm` 作為套件管理器。
+This project uses `npm` as its package manager.
 
 ```bash
 npm install
 ```
 
-### 3. 建置專案
+### 3. Build the Project
 
 ```bash
 npm run build
 ```
 
-這個指令會在專案根目錄下產生一個 `dist` 資料夾。
+This command will generate a `dist` folder in the project's root directory.
 
-### 4. 載入擴充功能至 Chrome
+### 4. Load the Extension in Chrome
 
-1.  開啟 Chrome 瀏覽器，前往 `chrome://extensions`。
-2.  啟用右上角的「開發人員模式」。
-3.  點擊「載入未封裝的項目」。
-4.  選擇剛剛產生的 `dist` 資料夾。
-5.  您應該就能在瀏覽器的工具列上看到「框選即翻譯」的圖示了。
+1.  Open Chrome and navigate to `chrome://extensions`.
+2.  Enable "Developer mode" in the top right corner.
+3.  Click "Load unpacked".
+4.  Select the newly generated `dist` folder.
+5.  You should now see the "Screen-Select-Translate" icon in your browser's toolbar.
 
-### 5. 設定 API 金鑰
+### 5. Set Up Your API Key
 
-本擴充功能需要您自己的 Google Cloud API 金鑰才能使用 OCR 與翻譯功能。請依照以下步驟申請：
+This extension requires your own Google Cloud API key to use the OCR and translation features. Please follow these steps to obtain one:
 
-#### A. 取得 Google Cloud API 金鑰
+#### A. Get a Google Cloud API Key
 
-1.  **建立/選取 Google Cloud 專案**
-    *   前往 [Google Cloud Console](https://console.cloud.google.com/) 並登入您的 Google 帳戶。
-    *   如果您還沒有專案，請點擊頁面頂端的專案選單，選擇「新增專案」。為專案命名後點擊「建立」。
+1.  **Create/Select a Google Cloud Project**
+    *   Go to the [Google Cloud Console](https://console.cloud.google.com/) and log in to your Google account.
+    *   If you don't have a project, click the project menu at the top of the page and select "New Project". Name your project and click "Create".
 
-2.  **為專案啟用計費功能**
-    *   Vision API 和 Translation API 是付費服務（但提供免費額度）。您必須為專案啟用計費。
-    *   在左側導覽選單中，前往「計費」，並將您的專案連結至一個有效的計費帳戶。
+2.  **Enable Billing for Your Project**
+    *   The Vision API and Translation API are paid services (though they offer a free tier). You must enable billing for your project.
+    *   In the left navigation menu, go to "Billing" and link your project to a valid billing account.
 
-3.  **啟用 Vision API 和 Translation API**
-    *   在左側導覽選單中，前往「API 和服務」>「程式庫」。
-    *   搜尋 `Cloud Vision API`，選取後點擊「啟用」。
-    *   再次返回「程式庫」，搜尋 `Cloud Translation API`，選取後點擊「啟用」。
+3.  **Enable the Vision and Translation APIs**
+    *   In the left navigation menu, go to "APIs & Services" > "Library".
+    *   Search for `Cloud Vision API`, select it, and click "Enable".
+    *   Return to the "Library", search for `Cloud Translation API`, select it, and click "Enable".
 
-4.  **建立 API 金鑰**
-    *   在左側導覽選單中，前往「API 和服務」>「憑證」。
-    *   點擊頁面上方的「+ 建立憑證」，然後選擇「API 金鑰」。
-    *   系統會產生您的 API 金鑰。請立即**複製**這組金鑰。
+4.  **Create an API Key**
+    *   In the left navigation menu, go to "APIs & Services" > "Credentials".
+    *   Click "+ CREATE CREDENTIALS" at the top of the page and select "API key".
+    *   Your API key will be generated. **Copy** this key immediately.
 
-5.  **限制金鑰以策安全 (強烈建議)**
-    *   在剛剛建立金鑰的彈出視窗中，點擊「編輯 API 金鑰」（或是在憑證清單中找到您的金鑰並點擊編輯圖示）。
-    *   在「應用程式限制」部分，您可以設定允許使用此金鑰的來源 (例如，特定網站或 IP 位址)，但對於擴充功能來說，此設定較複雜，可暫時保留「無」。
-    *   在「API 限制」部分，選擇「限制金鑰」。
-    *   在下方的「選取 API」下拉選單中，僅勾選 `Cloud Vision API` 和 `Cloud Translation API`。
-    *   點擊「儲存」。這能確保您的金鑰只能用於這兩項服務，防止被濫用。
+5.  **Restrict the Key for Security (Strongly Recommended)**
+    *   In the API key creation pop-up, click "EDIT API KEY" (or find your key in the credentials list and click the edit icon).
+    *   Under "Application restrictions", select "Websites".
+    *   Under "Website restrictions", click "ADD" and enter `chrome-extension://<your-extension-id>/*`, where `<your-extension-id>` is your extension's ID (found on the `chrome://extensions` page).
+    *   Under "API restrictions", select "Restrict key".
+    *   In the "Select APIs" dropdown below, check only `Cloud Vision API` and `Cloud Translation API`.
+    *   Click "Save". This ensures your key can only be used for these two services, preventing abuse.
 
-#### B. 將金鑰儲存至擴充功能
+#### B. Save the Key to the Extension
 
-1.  在 Chrome 工具列上，對著「框選即翻譯」的圖示**按右鍵**，然後點擊「**選項**」。
-2.  在開啟的設定頁面中，將您剛剛複製的 Google Cloud API 金鑰貼上到輸入框中。
-3.  點擊「儲存」。
+1.  In the Chrome toolbar, **right-click** the "Screen-Select-Translate" icon and click "**Options**".
+2.  On the options page that opens, paste the Google Cloud API key you just copied into the input field.
+3.  Click "Save".
 
-修改程式碼後，您通常需要在 `chrome://extensions` 頁面點擊「重新載入」按鈕來查看變更。
+After making code changes, you will typically need to click the "Reload" button on the `chrome://extensions` page to see your changes take effect.
