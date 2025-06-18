@@ -1,7 +1,6 @@
 <template>
-  <!-- 這是主要的事件監聽圖層 -->
+  <!-- Event listening layer -->
   <div v-if="isReady" class="event-layer" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp">
-    <!-- 遮罩與選取框只在拖曳時顯示 -->
     <template v-if="isSelecting">
       <div class="selection-overlay"></div>
       <div
@@ -18,11 +17,12 @@
 
   <!-- Loading Indicator -->
   <div v-if="isLoading" class="loading-indicator">
-    處理中...
+    <div class="spinner"></div>
+    <span>處理中...</span>
   </div>
 
   <!-- Result Card -->
-  <div v-if="showResult" class="result-card" :style="resultCardStyle">
+  <div v-if="showResult" class="result-card card" :style="resultCardStyle">
     <div class="result-card__header" @mousedown.prevent="handleResultDragStart">
       <span class="result-card__title">翻譯結果</span>
       <button @click="closeResult" class="result-card__close-btn">&times;</button>
@@ -32,7 +32,7 @@
       <div v-else>
         <div class="result-section">
           <strong class="result-section__title original" @click="isOcrVisible = !isOcrVisible">
-            原始文字 (OCR):
+            原始文字 (OCR)
             <span class="accordion-icon">{{ isOcrVisible ? '−' : '+' }}</span>
           </strong>
           <p v-if="isOcrVisible" class="result-section__text" :style="{ fontSize: `${settings.fontSize}px` }">{{ ocrText }}</p>
@@ -40,7 +40,7 @@
         <hr class="result-divider" />
         <div class="result-section">
           <strong class="result-section__title translated" @click="isTranslationVisible = !isTranslationVisible">
-            翻譯文字 (中文):
+            翻譯文字 (中文)
             <span class="accordion-icon">{{ isTranslationVisible ? '−' : '+' }}</span>
           </strong>
           <p v-if="isTranslationVisible" class="result-section__text" :style="{ fontSize: `${settings.fontSize}px` }">{{ translatedText }}</p>
@@ -53,9 +53,9 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 
-const isReady = ref(false); // 是否已啟動，準備好進行框選
-const isSelecting = ref(false); // 使用者是否正在拖曳選取
-const isMouseDown = ref(false); // 滑鼠按鍵是否被按住
+const isReady = ref(false);
+const isSelecting = ref(false);
+const isMouseDown = ref(false);
 const isLoading = ref(false);
 const showResult = ref(false);
 const ocrText = ref('');
@@ -86,7 +86,6 @@ const handleMouseDown = (e: any) => {
   isMouseDown.value = true;
   startPos.x = e.clientX;
   startPos.y = e.clientY;
-  // 初始化選取框，但尚不顯示
   selectionRect.x = e.clientX;
   selectionRect.y = e.clientY;
   selectionRect.width = 0;
@@ -96,11 +95,9 @@ const handleMouseDown = (e: any) => {
 const handleMouseMove = (e: any) => {
   if (!isMouseDown.value) return;
 
-  // 按下滑鼠後，檢查是否應該開始選取
   if (!isSelecting.value) {
     const moveX = Math.abs(e.clientX - startPos.x);
     const moveY = Math.abs(e.clientY - startPos.y);
-    // 只有在滑鼠移動超過一個小小的閾值後才開始選取
     if (moveX > 5 || moveY > 5) {
       isSelecting.value = true;
       document.body.style.cursor = 'crosshair';
@@ -118,33 +115,28 @@ const handleMouseMove = (e: any) => {
 };
 
 const handleMouseUp = async () => {
-  isMouseDown.value = false; // Reset mouse down state regardless
+  isMouseDown.value = false;
 
-  // 如果我們不是在選取模式（例如只是點擊而沒有拖曳），就直接退出
   if (!isSelecting.value) {
-    document.body.style.cursor = 'auto'; // 確保游標被重設
+    document.body.style.cursor = 'auto';
     return;
   }
   
   document.body.style.cursor = 'auto';
   isSelecting.value = false;
-  // 不要停用監聽圖層，讓使用者可以進行下一次選取
 
   if (selectionRect.width < 10 || selectionRect.height < 10) {
-    // 這是一個點擊，不是拖曳。直接忽略並等待下一次拖曳。
     return;
   }
 
   isLoading.value = true;
 
-  // 設定結果卡片的寬度
   const minWidth = 300;
   resultCardStyle.width = `${Math.max(selectionRect.width, minWidth)}px`;
 
-  // 根據設定來決定結果卡片的位置
-  const gap = 10; // 與選取範圍的間距為 10px
-  resultCardStyle.right = 'auto'; // 重設 right 定位
-  resultCardStyle.transform = ''; // 重設 transform
+  const gap = 10;
+  resultCardStyle.right = 'auto';
+  resultCardStyle.transform = '';
 
   switch (settings.popupPosition) {
     case 'top':
@@ -167,7 +159,6 @@ const handleMouseUp = async () => {
       resultCardStyle.left = `${selectionRect.x}px`;
       break;
   }
-
 
   chrome.runtime.sendMessage({
     action: 'processImage',
@@ -194,17 +185,13 @@ const handleResultDragStart = (e: any) => {
   dragState.startX = e.clientX;
   dragState.startY = e.clientY;
 
-  // 取得元素在畫面上的真實視覺位置，將 transform 的效果也計算在內
   const cardRect = (e.currentTarget as HTMLElement).parentElement!.getBoundingClientRect();
 
-  // 將 transform 後的位置「固定」到 top/left 屬性上，並移除 transform
-  // 這樣可以避免拖曳時的跳動，讓拖曳更平滑
   resultCardStyle.top = `${cardRect.top}px`;
   resultCardStyle.left = `${cardRect.left}px`;
   resultCardStyle.transform = 'none';
   resultCardStyle.right = 'auto';
 
-  // 拖曳的初始位置現在是已經「固定」好的 top/left
   dragState.initialCardX = cardRect.left;
   dragState.initialCardY = cardRect.top;
 
@@ -227,7 +214,6 @@ const handleResultDragEnd = () => {
 };
 
 const destroy = () => {
-  // 重設所有狀態到初始值，而不是移除整個元件
   document.body.style.cursor = 'auto';
   isReady.value = false;
   isMouseDown.value = false;
@@ -243,8 +229,6 @@ const destroy = () => {
 
 const closeResult = () => {
   showResult.value = false;
-  // 不要銷毀元件，只是隱藏結果。
-  // 元件會等待下一次的 'activate' 訊息。
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -256,7 +240,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
 onMounted(async () => {
   window.addEventListener('keydown', handleKeyDown);
 
-  // 監聽來自背景腳本的訊息
   chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (request.action === 'activate') {
       isReady.value = true;
@@ -276,15 +259,12 @@ onMounted(async () => {
         error.value = request.error || '發生未知錯誤。';
       }
       showResult.value = true;
-      // 這是推送訊息，不需要回應
     } else if (request.action === 'queryState') {
       sendResponse({ isActive: isReady.value });
     }
-    return true; // 保持訊息通道開啟以進行非同步回應
+    return true;
   });
 
-
-  // 掛載時載入設定
   chrome.storage.sync.get(['fontSize', 'popupPosition'], (result) => {
     if (result.fontSize) {
       settings.fontSize = result.fontSize;
@@ -294,7 +274,6 @@ onMounted(async () => {
     }
   });
 
-  // 監聽設定變更
   chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'sync') {
       if (changes.fontSize) {
@@ -314,9 +293,7 @@ onUnmounted(() => {
 </script>
 
 <style>
-/* 我們沒有使用 'scoped' 是因為這個容器被掛載在 body 的根層級，
-   但我們使用特定的 class 名稱來避免樣式衝突。 */
-
+/* Using global styles with specific class names to avoid conflicts */
 .event-layer {
   position: fixed;
   top: 0;
@@ -324,7 +301,6 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   z-index: 2147483640;
-  /* 這個圖層是透明的，但會捕捉滑鼠事件 */
   pointer-events: all;
 }
 
@@ -340,8 +316,8 @@ onUnmounted(() => {
 
 .selection-box {
   position: absolute;
-  border: 2px solid white;
-  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--color-primary);
+  background-color: rgba(98, 0, 238, 0.1);
 }
 
 .loading-indicator {
@@ -355,89 +331,102 @@ onUnmounted(() => {
   padding: 1rem 1.5rem;
   border-radius: 0.5rem;
   font-size: 1.125rem;
-  font-weight: 600;
-  font-family: sans-serif;
+  font-weight: 500;
+  font-family: var(--font-family);
+  display: flex;
+  align-items: center;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 0.75rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .result-card {
   position: fixed;
-  /* top, left, right 現在由 inline style 控制 */
   z-index: 2147483646;
-  /* width is now controlled by inline style */
   min-width: 300px;
   max-width: 90vw;
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.2), 0 8px 10px -6px rgb(0 0 0 / 0.2);
-  border: 1px solid #e2e8f0; /* slate-200 */
   display: flex;
   flex-direction: column;
-  font-family: sans-serif;
+  font-family: var(--font-family);
+  padding: 0; /* Remove padding from .card utility */
+  box-shadow: var(--shadow-dp8); /* More prominent shadow */
 }
 
 .result-card__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background-color: #1e293b; /* slate-800 */
-  border-bottom: 1px solid #334155; /* slate-700 */
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-bottom: 1px solid var(--color-primary-variant);
   cursor: move;
 }
 
 .result-card__title {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #f1f5f9; /* slate-100 */
+  font-weight: 500;
+  font-size: var(--font-size-body);
 }
 
 .result-card__close-btn {
   font-size: 1.5rem;
   line-height: 1;
-  color: #94a3b8; /* slate-400 */
+  color: var(--color-on-primary);
+  opacity: 0.7;
   background: none;
   border: none;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 .result-card__close-btn:hover {
-  color: #f8fafc; /* slate-50 */
+  opacity: 1;
 }
 
 .result-card__body {
-  padding: 1rem;
+  padding: calc(var(--spacing-unit) * 2);
   max-height: 24rem;
   overflow-y: auto;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
 }
 
 .error-text {
-  color: #dc2626; /* red-600 */
+  color: var(--color-error);
+  font-weight: 500;
 }
 
 .result-section {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--spacing-unit);
 }
 
 .result-section__title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: var(--font-size-caption);
   font-weight: 700;
-  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: calc(var(--spacing-unit) / 2);
   cursor: pointer;
-}
-.result-section__title.original {
-  color: #2563eb; /* blue-600 */
-}
-.result-section__title.translated {
-  color: #16a34a; /* green-600 */
+  color: var(--color-text-secondary);
 }
 
 .result-section__text {
-  /* font-size 現在由 inline style 控制 */
-  color: #1e293b; /* slate-800 */
+  color: var(--color-text-primary);
   white-space: pre-wrap;
-  padding-top: 0.25rem;
+  padding-top: calc(var(--spacing-unit) / 2);
   animation: fadeIn 0.3s ease;
 }
 
@@ -452,8 +441,8 @@ onUnmounted(() => {
 }
 
 .result-divider {
-  margin: 0.75rem 0;
-  border-color: #e2e8f0; /* slate-200 */
-  border-top-width: 1px;
+  margin: var(--spacing-unit) 0;
+  border: none;
+  border-top: 1px solid var(--color-divider);
 }
 </style>

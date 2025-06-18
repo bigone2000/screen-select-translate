@@ -1,58 +1,68 @@
 <template>
   <div class="options-page">
-    <div class="options-container">
-      <div>
-        <h1 class="options-container__title">設定</h1>
-        <p class="options-container__description">
+    <div class="options-container card">
+      <header class="options-header">
+        <h1 class="options-title">設定</h1>
+        <p class="options-description">
           管理您的 API 金鑰與擴充功能顯示設定。
         </p>
-      </div>
-      <div class="form-container">
+      </header>
+
+      <main class="form-container">
         <div class="form-group">
-          <label for="api-key" class="form-group__label">
+          <label for="api-key" class="form-label">
             Google Cloud API Key
           </label>
           <input
             v-model="apiKey"
             id="api-key"
             type="password"
-            class="form-group__input"
+            class="text-field"
             placeholder="請在此貼上您的 API 金鑰"
           />
         </div>
+
         <hr class="form-divider" />
+
         <div class="form-group">
-          <label for="font-size" class="form-group__label">
+          <label for="font-size" class="form-label">
             顯示結果字型大小 (px)
           </label>
           <input
             v-model.number="fontSize"
             id="font-size"
             type="number"
-            class="form-group__input"
+            class="text-field"
             placeholder="預設為 14"
           />
         </div>
+
         <div class="form-group">
-          <label for="popup-position" class="form-group__label">
+          <label for="popup-position" class="form-label">
             顯示結果彈出位置
           </label>
-          <select v-model="popupPosition" id="popup-position" class="form-group__select">
-            <option value="bottom">選取範圍下方</option>
-            <option value="top">選取範圍上方</option>
-            <option value="left">選取範圍左方</option>
-            <option value="right">選取範圍右方</option>
-          </select>
+          <div class="select-wrapper">
+            <select v-model="popupPosition" id="popup-position" class="select-field">
+              <option value="bottom">選取範圍下方</option>
+              <option value="top">選取範圍上方</option>
+              <option value="left">選取範圍左方</option>
+              <option value="right">選取範圍右方</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <button @click="saveSettings" class="button button--primary">
+
+        <div class="form-actions">
+          <button @click="saveSettings" class="button">
             儲存設定
           </button>
         </div>
-      </div>
-      <p v-if="statusMessage" class="status-message" :class="statusClass">
-        {{ statusMessage }}
-      </p>
+      </main>
+
+      <footer v-if="statusMessage" class="status-footer">
+        <p class="status-message" :class="statusClass">
+          {{ statusMessage }}
+        </p>
+      </footer>
     </div>
   </div>
 </template>
@@ -66,12 +76,10 @@ const popupPosition = ref('bottom');
 const statusMessage = ref('');
 const isError = ref(false);
 
-const statusClass = computed(() => {
-  return {
-    'status-message--error': isError.value,
-    'status-message--success': !isError.value,
-  };
-});
+const statusClass = computed(() => ({
+  'error': isError.value,
+  'success': !isError.value,
+}));
 
 const saveSettings = () => {
   if (!apiKey.value.trim()) {
@@ -87,13 +95,12 @@ const saveSettings = () => {
     popupPosition: popupPosition.value || 'bottom',
   };
 
-  // Use local storage for API key for security, sync for settings
   chrome.storage.local.set({ apiKey: settings.apiKey }, () => {
     if (chrome.runtime.lastError) {
       isError.value = true;
       statusMessage.value = `儲存失敗: ${chrome.runtime.lastError.message}`;
       setTimeout(() => { statusMessage.value = ''; }, 3000);
-      return; // Stop if API key saving fails
+      return;
     }
     
     chrome.storage.sync.set({ fontSize: settings.fontSize, popupPosition: settings.popupPosition }, () => {
@@ -102,7 +109,7 @@ const saveSettings = () => {
         statusMessage.value = `儲存失敗: ${chrome.runtime.lastError.message}`;
       } else {
         isError.value = false;
-        statusMessage.value = '設定已成功儲存！';
+        statusMessage.value = '設定已成功儲存，您可以關閉視窗！';
       }
       setTimeout(() => { statusMessage.value = ''; }, 3000);
     });
@@ -110,14 +117,12 @@ const saveSettings = () => {
 };
 
 onMounted(() => {
-  // Get API Key from local storage
   chrome.storage.local.get(['apiKey'], (result) => {
     if (result.apiKey) {
       apiKey.value = result.apiKey;
     }
   });
 
-  // Get settings from sync storage
   chrome.storage.sync.get(['fontSize', 'popupPosition'], (result) => {
     if (result.fontSize) {
       fontSize.value = result.fontSize;
@@ -132,136 +137,123 @@ onMounted(() => {
 <style scoped>
 .options-page {
   min-height: 100vh;
-  background-color: #f8fafc; /* slate-50 */
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  font-family: sans-serif;
+  padding-top: calc(var(--spacing-unit) * 8);
+  background-color: var(--color-background);
 }
 
 .options-container {
   width: 100%;
-  max-width: 28rem; /* max-w-md */
-  padding: 2rem; /* p-8 */
-  background-color: #ffffff;
-  border-radius: 0.5rem; /* rounded-lg */
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+  max-width: 480px;
+  padding: 0; /* Remove padding from card to allow header/footer to span full-width */
 }
 
-.options-container > *:not(:first-child) {
-    margin-top: 1.5rem; /* space-y-6 */
-}
-
-.options-container__title {
-  font-size: 1.5rem; /* text-2xl */
-  font-weight: 700; /* font-bold */
+.options-header {
+  padding: calc(var(--spacing-unit) * 3);
   text-align: center;
-  color: #1e293b; /* slate-800 */
 }
 
-.options-container__description {
-  margin-top: 0.5rem; /* mt-2 */
-  font-size: 0.875rem; /* text-sm */
-  text-align: center;
-  color: #475569; /* slate-600 */
+.options-title {
+  font-size: 16px; /* As requested */
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-unit) 0;
 }
 
-.form-container > *:not(:first-child) {
-    margin-top: 1rem; /* space-y-4 */
+.options-description {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.form-container {
+  padding: 0 calc(var(--spacing-unit) * 3);
 }
 
 .form-group {
-  /* No specific styles for the group wrapper itself */
+  margin-bottom: calc(var(--spacing-unit) * 3);
 }
 
-.form-group__label {
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 500; /* font-medium */
-  color: #334155; /* slate-700 */
-}
-
-.form-group__input {
-  width: 100%;
-  padding: 0.5rem 0.75rem; /* px-3 py-2 */
-  margin-top: 0.25rem; /* mt-1 */
-  color: #0f172a; /* slate-900 */
-  background-color: #f8fafc; /* bg-slate-50 */
-  border: 1px solid #cbd5e1; /* border-slate-300 */
-  border-radius: 0.375rem; /* rounded-md */
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
-  outline: none;
-}
-
-.form-group__input:focus {
-  border-color: #3b82f6; /* focus:border-blue-500 */
-  box-shadow: 0 0 0 2px #3b82f680; /* focus:ring-2 focus:ring-blue-500 */
+.form-label {
+  display: block;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-unit);
 }
 
 .form-divider {
-  margin: 1.5rem 0;
-  border-color: #e2e8f0; /* slate-200 */
-  border-top-width: 1px;
+  margin: calc(var(--spacing-unit) * 3) 0;
+  border: none;
+  border-top: 1px solid var(--color-divider);
 }
 
-.form-group__select {
+.select-wrapper {
+  position: relative;
+  display: inline-block;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  margin-top: 0.25rem;
-  color: #0f172a;
-  background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  outline: none;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: calc(var(--spacing-unit) * 1.5);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--color-text-secondary);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.select-field {
+  /* Replicating .text-field styles directly and removing native arrow */
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 1.5) var(--spacing-unit); /* Make space for custom arrow */
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius);
+  background-color: var(--color-background);
+  width: 100%;
+  box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
 }
 
-.form-group__select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px #3b82f680;
-}
-
-.button {
-  width: 100%;
-  padding: 0.5rem 1rem; /* px-4 py-2 */
-  font-weight: 600; /* font-semibold */
-  border-radius: 0.375rem; /* rounded-md */
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.select-field:focus {
   outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
 }
 
-.button--primary {
-  color: #ffffff;
-  background-color: #2563eb; /* bg-blue-600 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
 }
 
-.button--primary:hover {
-  background-color: #1d4ed8; /* hover:bg-blue-700 */
-}
-
-.button--primary:focus {
-  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #3b82f6; /* focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 */
+.status-footer {
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
+  border-top: 1px solid var(--color-divider);
 }
 
 .status-message {
-  font-size: 0.875rem; /* text-sm */
+  font-size: var(--font-size-body);
   text-align: center;
-  font-weight: 500; /* font-medium */
+  font-weight: 500;
+  margin: 0;
 }
 
-.status-message--success {
-  color: #16a34a; /* text-green-600 */
+.status-message.success {
+  color: var(--color-primary);
 }
 
-.status-message--error {
-  color: #dc2626; /* text-red-600 */
+.status-message.error {
+  color: var(--color-error);
 }
 </style>

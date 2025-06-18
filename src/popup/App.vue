@@ -6,120 +6,97 @@
     </header>
 
     <main class="popup-content">
-      <p v-if="!isUnsupportedPage" class="popup-description">
-        點擊下方按鈕，即可在網頁上拖曳選取您想翻譯的區域。
-      </p>
-      <p v-else class="popup-description error-message">
-        {{ unsupportedMessage }}
+      <p class="popup-description">
+        點擊下方按鈕，在網頁上拖曳選取範圍。
       </p>
     </main>
 
     <footer class="popup-footer">
-      <button
-        @click="toggleActivation"
-        class="popup-button"
-        :class="{ 'is-active': isActive }"
-        :disabled="isUnsupportedPage"
-      >
-        {{ isActive ? '退出選取模式' : '啟動選取' }}
+      <button @click="toggleActivation" class="button" :class="{ 'is-active': isActive }" :disabled="isUnsupportedPage">
+        {{ isActive ? '退出選取' : '啟動選取' }}
       </button>
+      <div v-if="unsupportedMessage">
+        <p class="error-message">{{ unsupportedMessage }}</p>
+      </div>
       <p class="version-tag">v{{ version }}</p>
     </footer>
   </div>
 </template>
 
 <style scoped>
-/* 全局樣式與字體 */
 .popup-container {
   display: flex;
   flex-direction: column;
-  width: 280px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f9fafb; /* 更柔和的背景色 */
-  color: #374151; /* 深灰色文字 */
+  width: 300px;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
 }
 
-/* 頁首 */
 .popup-header {
   display: flex;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: calc(var(--spacing-unit) * 2);
+  border-bottom: 1px solid var(--color-divider);
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e0e0e0' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .logo {
   width: 24px;
   height: 24px;
-  margin-right: 12px;
+  margin-right: calc(var(--spacing-unit) * 1.5);
 }
 
 .popup-title {
-  font-size: 1.125rem; /* 18px */
-  font-weight: 600;
-  color: #111827;
+  font-size: var(--font-size-title);
+  font-weight: 500;
   margin: 0;
   line-height: 1;
 }
 
-/* 主要內容 */
 .popup-content {
-  padding: 16px;
+  padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
+  /* More vertical padding */
   text-align: center;
+  background-color: #fafafa;
 }
 
 .popup-description {
-  font-size: 0.875rem; /* 14px */
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
   line-height: 1.5;
   margin: 0;
 }
 
 .error-message {
-  color: #ef4444; /* 更鮮明的紅色 */
+  color: var(--color-error);
   font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
 }
 
-/* 頁腳 */
 .popup-footer {
-  padding: 16px;
-  background-color: #f3f4f6;
-  border-top: 1px solid #e5e7eb;
+  padding: calc(var(--spacing-unit) * 2);
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-divider);
+  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='%23d2d2d2' fill-opacity='0.4'%3E%3Ccircle cx='12' cy='12' r='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* 按鈕 */
-.popup-button {
+/* Override for the main action button */
+.button {
   width: 100%;
-  padding: 10px 16px;
-  font-size: 0.9375rem; /* 15px */
-  font-weight: 500;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  background: linear-gradient(45deg, #3b82f6, #6366f1);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
-.popup-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+/* Specific style for the active (deactivation) state */
+.button.is-active {
+  background-color: var(--color-error);
 }
 
-.popup-button.is-active {
-  background: linear-gradient(45deg, #6b7280, #4b5563);
-}
-
-.popup-button:disabled {
-  background: #d1d5db;
-  cursor: not-allowed;
-}
-
-/* 版本號 */
 .version-tag {
-  font-size: 0.75rem; /* 12px */
-  color: #6b7280;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
   text-align: center;
-  margin-top: 12px;
+  margin-top: var(--spacing-unit);
   margin-bottom: 0;
 }
 </style>
