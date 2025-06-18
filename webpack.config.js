@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
   entry: {
-    background: './src/background.ts',
+    background: './src/background/index.ts',
     content: './src/content/main.ts',
     popup: './src/popup/main.ts',
     options: './src/options/main.ts',
