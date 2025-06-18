@@ -9,6 +9,7 @@ This is a Chrome browser extension that allows users to easily select any area o
 - **Select Any Area**: Activate the extension by clicking its icon on any webpage, then drag your mouse to select the area you want to translate.
 - **OCR Text Recognition**: Utilizes the Google Cloud Vision API for high-accuracy optical character recognition.
 - **Real-time Translation**: Uses the Google Cloud Translation API to translate the recognized text.
+- **Quick Exit**: Easily exit selection mode by clicking the extension icon again or pressing the `Esc` key.
 - **Draggable Result Window**: The translation result is displayed in a freely draggable pop-up window for easy comparison with the original text.
 - **Accordion-style Display**: The original and translated texts are presented in an accordion style, with the translation shown by default for a cleaner interface.
 - **Highly Customizable**:
