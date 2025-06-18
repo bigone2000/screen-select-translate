@@ -18,14 +18,12 @@
   <!-- 載入指示器 -->
   <div v-if="isLoading" class="loading-indicator">
     <div class="spinner"></div>
-    <!-- 處理中... -->
     <span>{{ $t('content.loading') }}</span>
   </div>
 
   <!-- 結果卡片 -->
-  <div v-if="showResult" class="result-card card" :style="resultCardStyle">
+  <div v-if="showResult" ref="resultCardRef" class="result-card card" :style="resultCardStyle">
     <div class="result-card__header" @mousedown.prevent="handleResultDragStart">
-      <!-- 翻譯結果 -->
       <span class="result-card__title">{{ $t('content.resultTitle') }}</span>
       <button @click="closeResult" class="result-card__close-btn">&times;</button>
     </div>
@@ -34,7 +32,6 @@
       <div v-else>
         <div class="result-section">
           <strong class="result-section__title original" @click="isOcrVisible = !isOcrVisible">
-            <!-- 原始文字 (OCR) -->
             {{ $t('content.originalText') }}
             <span class="accordion-icon">{{ isOcrVisible ? '−' : '+' }}</span>
           </strong>
@@ -43,7 +40,6 @@
         <hr class="result-divider" />
         <div class="result-section">
           <strong class="result-section__title translated" @click="isTranslationVisible = !isTranslationVisible">
-            <!-- 翻譯文字 -->
             {{ $t('content.translatedText') }}
             <span class="accordion-icon">{{ isTranslationVisible ? '−' : '+' }}</span>
           </strong>
@@ -55,187 +51,107 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useSelection } from '@/composables/useSelection';
+import { useDraggable } from '@/composables/useDraggable';
+import { useSettings } from '@/composables/useSettings';
+import type { Rect } from '@/types';
 
 const { t } = useI18n();
-const isReady = ref(false);
-const isSelecting = ref(false);
-const isMouseDown = ref(false);
+
+// --- 核心狀態管理 ---
+const isReady = ref(false); // 是否已啟動，準備好進行框選
 const isLoading = ref(false);
 const showResult = ref(false);
 const ocrText = ref('');
 const translatedText = ref('');
 const error = ref('');
 
-const startPos = reactive({ x: 0, y: 0 });
-const selectionRect = reactive({ x: 0, y: 0, width: 0, height: 0 });
-
-const resultCardStyle = reactive({
-  top: '20px',
-  left: 'auto',
-  right: '20px',
-  transform: '',
-  width: 'auto',
-});
-const settings = reactive({
-  fontSize: 14,
-  popupPosition: 'bottom',
-});
+// --- 結果卡片可見性 ---
 const isOcrVisible = ref(false);
 const isTranslationVisible = ref(true);
 
-const handleMouseDown = (e: any) => {
-  e.preventDefault();
-  e.stopPropagation();
+// --- 組合式函式 ---
+const resultCardRef = ref<HTMLElement | null>(null);
+const { settings } = useSettings();
+const { position: resultCardPosition, handleDragStart: handleResultDragStart } = useDraggable(resultCardRef);
+const {
+  isSelecting,
+  selectionRect,
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+  resetSelection,
+} = useSelection(handleSelectionEnd);
 
-  isMouseDown.value = true;
-  startPos.x = e.clientX;
-  startPos.y = e.clientY;
-  selectionRect.x = e.clientX;
-  selectionRect.y = e.clientY;
-  selectionRect.width = 0;
-  selectionRect.height = 0;
-};
+// --- 樣式計算 ---
+const resultCardStyle = computed(() => ({
+  ...resultCardPosition,
+  width: resultCardWidth.value,
+}));
+const resultCardWidth = ref('auto');
 
-const handleMouseMove = (e: any) => {
-  if (!isMouseDown.value) return;
 
-  if (!isSelecting.value) {
-    const moveX = Math.abs(e.clientX - startPos.x);
-    const moveY = Math.abs(e.clientY - startPos.y);
-    if (moveX > 5 || moveY > 5) {
-      isSelecting.value = true;
-      document.body.style.cursor = 'crosshair';
-    }
-  }
+// --- 核心邏輯 ---
 
-  if (isSelecting.value) {
-    const currentX = e.clientX;
-    const currentY = e.clientY;
-    selectionRect.x = Math.min(startPos.x, currentX);
-    selectionRect.y = Math.min(startPos.y, currentY);
-    selectionRect.width = Math.abs(currentX - startPos.x);
-    selectionRect.height = Math.abs(currentY - startPos.y);
-  }
-};
-
-const handleMouseUp = async () => {
-  isMouseDown.value = false;
-
-  if (!isSelecting.value) {
-    document.body.style.cursor = 'auto';
-    return;
-  }
-  
-  document.body.style.cursor = 'auto';
-  isSelecting.value = false;
-
-  if (selectionRect.width < 10 || selectionRect.height < 10) {
-    return;
-  }
-
+// 當選取結束時的回呼函式
+function handleSelectionEnd(rect: Rect) {
   isLoading.value = true;
-
+  
+  // 設定結果卡片的位置與寬度
   const minWidth = 300;
-  resultCardStyle.width = `${Math.max(selectionRect.width, minWidth)}px`;
-
+  resultCardWidth.value = `${Math.max(rect.width, minWidth)}px`;
+  
   const gap = 10;
-  resultCardStyle.right = 'auto';
-  resultCardStyle.transform = '';
+  resultCardPosition.right = 'auto';
+  resultCardPosition.transform = '';
 
   switch (settings.popupPosition) {
     case 'top':
-      resultCardStyle.top = `${selectionRect.y - gap}px`;
-      resultCardStyle.left = `${selectionRect.x}px`;
-      resultCardStyle.transform = 'translateY(-100%)';
+      resultCardPosition.top = `${rect.y - gap}px`;
+      resultCardPosition.left = `${rect.x}px`;
+      resultCardPosition.transform = 'translateY(-100%)';
       break;
     case 'left':
-      resultCardStyle.top = `${selectionRect.y}px`;
-      resultCardStyle.left = `${selectionRect.x - gap}px`;
-      resultCardStyle.transform = 'translateX(-100%)';
+      resultCardPosition.top = `${rect.y}px`;
+      resultCardPosition.left = `${rect.x - gap}px`;
+      resultCardPosition.transform = 'translateX(-100%)';
       break;
     case 'right':
-      resultCardStyle.top = `${selectionRect.y}px`;
-      resultCardStyle.left = `${selectionRect.x + selectionRect.width + gap}px`;
+      resultCardPosition.top = `${rect.y}px`;
+      resultCardPosition.left = `${rect.x + rect.width + gap}px`;
       break;
     case 'bottom':
     default:
-      resultCardStyle.top = `${selectionRect.y + selectionRect.height + gap}px`;
-      resultCardStyle.left = `${selectionRect.x}px`;
+      resultCardPosition.top = `${rect.y + rect.height + gap}px`;
+      resultCardPosition.left = `${rect.x}px`;
       break;
   }
 
+  // 向背景腳本發送圖片處理請求
   chrome.runtime.sendMessage({
     action: 'processImage',
-    rect: {
-      x: selectionRect.x,
-      y: selectionRect.y,
-      width: selectionRect.width,
-      height: selectionRect.height,
-    },
+    rect,
     devicePixelRatio: window.devicePixelRatio || 1,
   });
-};
+}
 
-const dragState = reactive({
-  isDragging: false,
-  startX: 0,
-  startY: 0,
-  initialCardX: 0,
-  initialCardY: 0,
-});
-
-const handleResultDragStart = (e: any) => {
-  dragState.isDragging = true;
-  dragState.startX = e.clientX;
-  dragState.startY = e.clientY;
-
-  const cardRect = (e.currentTarget as HTMLElement).parentElement!.getBoundingClientRect();
-
-  resultCardStyle.top = `${cardRect.top}px`;
-  resultCardStyle.left = `${cardRect.left}px`;
-  resultCardStyle.transform = 'none';
-  resultCardStyle.right = 'auto';
-
-  dragState.initialCardX = cardRect.left;
-  dragState.initialCardY = cardRect.top;
-
-  window.addEventListener('mousemove', handleResultDragMove);
-  window.addEventListener('mouseup', handleResultDragEnd);
-};
-
-const handleResultDragMove = (e: MouseEvent) => {
-  if (!dragState.isDragging) return;
-  const dx = e.clientX - dragState.startX;
-  const dy = e.clientY - dragState.startY;
-  resultCardStyle.top = `${dragState.initialCardY + dy}px`;
-  resultCardStyle.left = `${dragState.initialCardX + dx}px`;
-};
-
-const handleResultDragEnd = () => {
-  dragState.isDragging = false;
-  window.removeEventListener('mousemove', handleResultDragMove);
-  window.removeEventListener('mouseup', handleResultDragEnd);
-};
-
-const destroy = () => {
-  document.body.style.cursor = 'auto';
-  isReady.value = false;
-  isMouseDown.value = false;
-  isSelecting.value = false;
-  isLoading.value = false;
-  showResult.value = false;
-  ocrText.value = '';
-  translatedText.value = '';
-  error.value = '';
-  Object.assign(startPos, { x: 0, y: 0 });
-  Object.assign(selectionRect, { x: 0, y: 0, width: 0, height: 0 });
-};
-
+// 關閉結果卡片
 const closeResult = () => {
   showResult.value = false;
 };
+
+// 完全重設元件狀態
+const destroy = () => {
+  document.body.style.cursor = 'auto';
+  isReady.value = false;
+  isLoading.value = false;
+  showResult.value = false;
+  resetSelection();
+};
+
+// --- 事件與訊息監聽 ---
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
@@ -243,7 +159,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
 
   chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
@@ -262,40 +178,17 @@ onMounted(async () => {
       } else {
         ocrText.value = '';
         translatedText.value = '';
-        error.value = request.error || t('content.error.unknown'); // 發生未知錯誤。
+        error.value = request.error || t('content.error.unknown');
       }
       showResult.value = true;
-      // 這是來自背景的推播訊息，不需要回應，所以不返回 true
     } else if (request.action === 'queryState') {
       sendResponse({ isActive: isReady.value });
-      // 只有在確實需要非同步回應時才返回 true
       return true;
-    }
-  });
-
-  chrome.storage.sync.get(['fontSize', 'popupPosition'], (result) => {
-    if (result.fontSize) {
-      settings.fontSize = result.fontSize;
-    }
-    if (result.popupPosition) {
-      settings.popupPosition = result.popupPosition;
-    }
-  });
-
-  chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (namespace === 'sync') {
-      if (changes.fontSize) {
-        settings.fontSize = changes.fontSize.newValue;
-      }
-      if (changes.popupPosition) {
-        settings.popupPosition = changes.popupPosition.newValue;
-      }
     }
   });
 });
 
 onUnmounted(() => {
-  document.body.style.cursor = 'auto';
   window.removeEventListener('keydown', handleKeyDown);
 });
 </script>
