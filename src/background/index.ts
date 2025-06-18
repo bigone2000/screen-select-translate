@@ -1,7 +1,8 @@
 import type { Rect } from '@/types';
-import { callTranslateApi, callVisionApi } from '@/utils/api';
 import { cropImage } from '@/utils/image';
 import { getApiKey } from '@/utils/storage';
+import { ApiServiceFactory } from '@/services/ApiServiceFactory';
+import type { ApiServiceInterface } from '@/services/ApiServiceInterface';
 
 async function handleProcessImage(request: { rect: Rect, devicePixelRatio: number }, sender: chrome.runtime.MessageSender) {
   const sourceTabId = sender.tab?.id;
@@ -16,6 +17,8 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
 
   try {
     const apiKey = await getApiKey();
+    // TODO: 未來可以讓使用者在設定頁選擇服務提供者
+    const apiService: ApiServiceInterface = ApiServiceFactory.create('google', apiKey);
 
     const fullImageDataUrl = await chrome.tabs.captureVisibleTab({ format: 'png' });
     // 擷取螢幕畫面失敗。
@@ -24,18 +27,18 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
     const croppedImageDataUrl = await cropImage(fullImageDataUrl, request.rect, request.devicePixelRatio);
     const base64content = croppedImageDataUrl.split(',')[1];
 
-    const ocrText = await callVisionApi(base64content, apiKey);
+    const ocrText = await apiService.callVisionApi(base64content);
     if (!ocrText.trim()) {
       // 未偵測到任何文字。
       sendResult({ success: true, ocrText: '', translatedText: chrome.i18n.getMessage('info_noTextDetected') });
       return;
     }
 
-    // 從儲存空間獲取目標語言，若無則使用預設值，預設值默認英文
+    // 從儲存空間獲取目標語言，若無則使用預設值
     const storageResult = await chrome.storage.sync.get('targetLanguage');
-    const targetLanguage = storageResult.targetLanguage || 'en';
+    const targetLanguage = storageResult.targetLanguage || 'en'; // 預設為英文
 
-    const translatedText = await callTranslateApi(ocrText, apiKey, targetLanguage);
+    const translatedText = await apiService.callTranslateApi(ocrText, targetLanguage);
 
     sendResult({ success: true, ocrText, translatedText });
 
