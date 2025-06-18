@@ -1,5 +1,5 @@
 <template>
-  <!-- Event listening layer -->
+  <!-- 事件監聽圖層 -->
   <div v-if="isReady" class="event-layer" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp">
     <template v-if="isSelecting">
       <div class="selection-overlay"></div>
@@ -15,13 +15,13 @@
     </template>
   </div>
 
-  <!-- Loading Indicator -->
+  <!-- 載入指示器 -->
   <div v-if="isLoading" class="loading-indicator">
     <div class="spinner"></div>
     <span>處理中...</span>
   </div>
 
-  <!-- Result Card -->
+  <!-- 結果卡片 -->
   <div v-if="showResult" class="result-card card" :style="resultCardStyle">
     <div class="result-card__header" @mousedown.prevent="handleResultDragStart">
       <span class="result-card__title">翻譯結果</span>
