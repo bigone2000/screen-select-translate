@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Scrren-Select-Translate",
+    "description": "The name of the extension."
+  },
+  "extDesc": {
+    "message": "Select, OCR, and translate text directly from your screen.",
+    "description": "The description of the extension."
+  },
+  "optionsTitle": {
+    "message": "Settings",
+    "description": "The title of the options page."
+  }
+}

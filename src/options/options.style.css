@@ -10,7 +10,7 @@
 .options-container {
   width: 100%;
   max-width: 480px;
-  padding: 0; /* Remove padding from card to allow header/footer to span full-width */
+  padding: 0; /* 移除卡片內距，讓頁首和頁尾可以滿版 */
 }
 
 .options-header {
@@ -19,7 +19,7 @@
 }
 
 .options-title {
-  font-size: 16px; /* As requested */
+  font-size: 16px; /* 根據要求 */
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -74,10 +74,10 @@
 }
 
 .select-field {
-  /* Replicating .text-field styles directly and removing native arrow */
+  /* 直接複製 .text-field 的樣式並移除原生箭頭 */
   font-family: var(--font-family);
   font-size: var(--font-size-body);
-  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 1.5) var(--spacing-unit); /* Make space for custom arrow */
+  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 1.5) var(--spacing-unit); /* 為自訂箭頭騰出空間 */
   border: 1px solid var(--color-divider);
   border-radius: var(--border-radius);
   background-color: var(--color-background);
@@ -100,7 +100,7 @@
   padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
 }
 
-/* --- Custom Select --- */
+/* --- 自訂下拉選單 --- */
 .custom-select {
   position: relative;
   width: 100%;

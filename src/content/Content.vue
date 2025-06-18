@@ -18,13 +18,15 @@
   <!-- 載入指示器 -->
   <div v-if="isLoading" class="loading-indicator">
     <div class="spinner"></div>
-    <span>處理中...</span>
+    <!-- 處理中... -->
+    <span>{{ $t('content.loading') }}</span>
   </div>
 
   <!-- 結果卡片 -->
   <div v-if="showResult" class="result-card card" :style="resultCardStyle">
     <div class="result-card__header" @mousedown.prevent="handleResultDragStart">
-      <span class="result-card__title">翻譯結果</span>
+      <!-- 翻譯結果 -->
+      <span class="result-card__title">{{ $t('content.resultTitle') }}</span>
       <button @click="closeResult" class="result-card__close-btn">&times;</button>
     </div>
     <div class="result-card__body">
@@ -32,7 +34,8 @@
       <div v-else>
         <div class="result-section">
           <strong class="result-section__title original" @click="isOcrVisible = !isOcrVisible">
-            原始文字 (OCR)
+            <!-- 原始文字 (OCR) -->
+            {{ $t('content.originalText') }}
             <span class="accordion-icon">{{ isOcrVisible ? '−' : '+' }}</span>
           </strong>
           <p v-if="isOcrVisible" class="result-section__text" :style="{ fontSize: `${settings.fontSize}px` }">{{ ocrText }}</p>
@@ -40,7 +43,8 @@
         <hr class="result-divider" />
         <div class="result-section">
           <strong class="result-section__title translated" @click="isTranslationVisible = !isTranslationVisible">
-            翻譯文字 (中文)
+            <!-- 翻譯文字 -->
+            {{ $t('content.translatedText') }}
             <span class="accordion-icon">{{ isTranslationVisible ? '−' : '+' }}</span>
           </strong>
           <p v-if="isTranslationVisible" class="result-section__text" :style="{ fontSize: `${settings.fontSize}px` }">{{ translatedText }}</p>
@@ -52,7 +56,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const isReady = ref(false);
 const isSelecting = ref(false);
 const isMouseDown = ref(false);
@@ -256,7 +262,7 @@ onMounted(async () => {
       } else {
         ocrText.value = '';
         translatedText.value = '';
-        error.value = request.error || '發生未知錯誤。';
+        error.value = request.error || t('content.error.unknown'); // 發生未知錯誤。
       }
       showResult.value = true;
     } else if (request.action === 'queryState') {

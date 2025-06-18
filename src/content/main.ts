@@ -8,4 +8,5 @@ appContainer.id = 'screen-translator-vue-container';
 document.body.appendChild(appContainer);
 
 // 建立並掛載 Vue 應用程式
-createApp(Content).mount(appContainer);
+import i18n from '@/i18n';
+createApp(Content).use(i18n).mount(appContainer);

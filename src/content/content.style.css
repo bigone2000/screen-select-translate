@@ -1,4 +1,4 @@
-/* Using global styles with specific class names to avoid conflicts */
+/* 使用全域樣式，並透過特定的類別名稱來避免樣式衝突 */
 .event-layer {
   position: fixed;
   top: 0;
@@ -64,8 +64,8 @@
   display: flex;
   flex-direction: column;
   font-family: var(--font-family);
-  padding: 0; /* Remove padding from .card utility */
-  box-shadow: var(--shadow-dp8); /* More prominent shadow */
+  padding: 0; /* 移除 .card 工具類別的內距 */
+  box-shadow: var(--shadow-dp8); /* 更明顯的陰影 */
 }
 
 .result-card__header {

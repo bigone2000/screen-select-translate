@@ -55,7 +55,7 @@ export default {
         },
         {
           from: 'public',
-          to: '.', // Copies contents of public to dist root
+          to: '.', // 將 public 的內容複製到 dist 根目錄
         },
         {
           from: 'src/popup/index.html',

@@ -2,23 +2,23 @@
   <div class="options-page">
     <div class="options-container card">
       <header class="options-header">
-        <h1 class="options-title">設定</h1>
+        <h1 class="options-title">{{ t('options.title') }}</h1>
         <p class="options-description">
-          管理您的 API 金鑰與擴充功能顯示設定。
+          {{ t('options.description') }}
         </p>
       </header>
 
       <main class="form-container">
         <div class="form-group">
           <label for="api-key" class="form-label">
-            Google Cloud API Key
+            {{ t('options.apiKey') }}
           </label>
           <input
             v-model="apiKey"
             id="api-key"
             type="password"
             class="text-field"
-            placeholder="請在此貼上您的 API 金鑰"
+            :placeholder="t('options.apiKeyPlaceholder')"
           />
         </div>
 
@@ -26,40 +26,40 @@
 
         <div class="form-group">
           <label for="font-size" class="form-label">
-            顯示結果字型大小 (px)
+            {{ t('options.fontSize') }}
           </label>
           <input
             v-model.number="fontSize"
             id="font-size"
             type="number"
             class="text-field"
-            placeholder="預設為 14"
+            :placeholder="t('options.fontSizePlaceholder')"
           />
         </div>
 
         <div class="form-group">
           <label for="popup-position" class="form-label">
-            顯示結果彈出位置
+            {{ t('options.popupPosition') }}
           </label>
           <div class="select-wrapper">
             <select v-model="popupPosition" id="popup-position" class="select-field">
-              <option value="bottom">選取範圍下方</option>
-              <option value="top">選取範圍上方</option>
-              <option value="left">選取範圍左方</option>
-              <option value="right">選取範圍右方</option>
+              <option value="bottom">{{ t('options.popupPositionBottom') }}</option>
+              <option value="top">{{ t('options.popupPositionTop') }}</option>
+              <option value="left">{{ t('options.popupPositionLeft') }}</option>
+              <option value="right">{{ t('options.popupPositionRight') }}</option>
             </select>
           </div>
         </div>
 
         <div class="form-group">
           <label for="target-language" class="form-label">
-            目標語言
+            {{ t('options.targetLanguage') }}
           </label>
-          <!-- Custom Select Component -->
+          <!-- 自訂下拉選單元件 -->
           <div class="custom-select" ref="customSelectRef">
             <div class="custom-select__trigger" @click="isLangDropdownOpen = !isLangDropdownOpen">
               <img v-if="selectedLanguage?.countryCode" :src="`https://flagcdn.com/w20/${selectedLanguage.countryCode}.png`" class="flag-icon" />
-              <span>{{ selectedLanguage?.name || '請選擇語言' }}</span>
+              <span>{{ selectedLanguage ? t('languages.' + selectedLanguage.code, selectedLanguage.name) : t('options.selectLanguage') }}</span>
               <div class="custom-select__arrow" :class="{ 'open': isLangDropdownOpen }"></div>
             </div>
             <ul v-if="isLangDropdownOpen" class="custom-select__options">
@@ -72,7 +72,7 @@
               >
                 <img v-if="lang.countryCode" :src="`https://flagcdn.com/w20/${lang.countryCode}.png`" class="flag-icon" />
                 <span v-else class="flag-icon-placeholder"></span>
-                <span>{{ lang.name }}</span>
+                <span>{{ t('languages.' + lang.code, lang.name) }}</span>
               </li>
             </ul>
           </div>
@@ -80,7 +80,7 @@
 
         <div class="form-actions">
           <button @click="saveSettings" class="button">
-            儲存設定
+            {{ t('options.saveButton') }}
           </button>
         </div>
       </main>
@@ -96,8 +96,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { supportedLanguages, type Language } from '@/utils/languages';
 
+const { t } = useI18n();
 const apiKey = ref('');
 const fontSize = ref(14);
 const popupPosition = ref('bottom');
@@ -136,7 +138,7 @@ watch(isLangDropdownOpen, (isOpen) => {
 const saveSettings = () => {
   if (!apiKey.value.trim()) {
     isError.value = true;
-    statusMessage.value = 'API 金鑰不能為空。';
+    statusMessage.value = t('options.status.emptyKey'); // API 金鑰不能為空。
     setTimeout(() => { statusMessage.value = ''; }, 3000);
     return;
   }
@@ -151,7 +153,7 @@ const saveSettings = () => {
   chrome.storage.local.set({ apiKey: settings.apiKey }, () => {
     if (chrome.runtime.lastError) {
       isError.value = true;
-      statusMessage.value = `儲存失敗: ${chrome.runtime.lastError.message}`;
+      statusMessage.value = t('options.status.saveFailed', { message: chrome.runtime.lastError.message });
       setTimeout(() => { statusMessage.value = ''; }, 3000);
       return;
     }
@@ -163,10 +165,10 @@ const saveSettings = () => {
     }, () => {
       if (chrome.runtime.lastError) {
         isError.value = true;
-        statusMessage.value = `儲存失敗: ${chrome.runtime.lastError.message}`;
+        statusMessage.value = t('options.status.saveFailed', { message: chrome.runtime.lastError.message });
       } else {
         isError.value = false;
-        statusMessage.value = '設定已成功儲存，您可以關閉視窗！';
+        statusMessage.value = t('options.status.saveSuccess');
       }
       setTimeout(() => { statusMessage.value = ''; }, 3000);
     });

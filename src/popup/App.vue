@@ -6,14 +6,16 @@
     </header>
 
     <main class="popup-content">
+      <!-- 點擊下方按鈕，在網頁上拖曳選取範圍。 -->
       <p class="popup-description">
-        點擊下方按鈕，在網頁上拖曳選取範圍。
+        {{ $t('popup.description') }}
       </p>
     </main>
 
     <footer class="popup-footer">
+      <!-- 退出選取 / 啟動選取 -->
       <button @click="toggleActivation" class="button" :class="{ 'is-active': isActive }" :disabled="isUnsupportedPage">
-        {{ isActive ? '退出選取' : '啟動選取' }}
+        {{ isActive ? $t('popup.deactivate') : $t('popup.activate') }}
       </button>
       <div v-if="unsupportedMessage">
         <p class="error-message">{{ unsupportedMessage }}</p>

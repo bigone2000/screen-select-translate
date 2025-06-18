@@ -29,7 +29,7 @@
 
 .popup-content {
   padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
-  /* More vertical padding */
+  /* 增加垂直內距 */
   text-align: center;
   background-color: #fafafa;
 }
@@ -56,12 +56,12 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='%23d2d2d2' fill-opacity='0.4'%3E%3Ccircle cx='12' cy='12' r='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Override for the main action button */
+/* 覆寫主要操作按鈕的樣式 */
 .button {
   width: 100%;
 }
 
-/* Specific style for the active (deactivation) state */
+/* 啟用（停用）狀態下的特定樣式 */
 .button.is-active {
   background-color: var(--color-error);
 }

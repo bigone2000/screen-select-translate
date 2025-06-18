@@ -29,9 +29,9 @@ async function handleProcessImage(request: { rect: Rect, devicePixelRatio: numbe
       return;
     }
 
-    // 從儲存空間獲取目標語言，若無則使用預設值
+    // 從儲存空間獲取目標語言，若無則使用預設值，預設值默認英文
     const storageResult = await chrome.storage.sync.get('targetLanguage');
-    const targetLanguage = storageResult.targetLanguage || 'zh-TW';
+    const targetLanguage = storageResult.targetLanguage || 'en';
 
     const translatedText = await callTranslateApi(ocrText, apiKey, targetLanguage);
 
