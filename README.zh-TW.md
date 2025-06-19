@@ -1,8 +1,11 @@
-# 框選即翻譯 (Screen-Select-Translate)
+# 框選即翻譯
 
 [English](./README.md) | [繁體中文](./README.zh-TW.md)
 
 這是一個 Chrome 瀏覽器擴充套件，讓使用者可以輕鬆框選網頁上的任何區域，並立即對選取範圍內的文字進行 OCR 辨識與翻譯。它特別適用於翻譯圖片、影片、Canvas 或任何無法直接選取複製的網頁內容。
+
+## ▶️ 功能演示
+![功能演示](assets/demo.gif)
 
 ## ✨ 主要功能
 
