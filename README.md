@@ -4,6 +4,8 @@
 
 This is a Chrome browser extension that allows users to easily select any area on a webpage and instantly perform OCR recognition and translation on the text within the selected area. It is particularly useful for translating text from images, videos, Canvas, or any web content that cannot be directly selected and copied.
 
+## ▶️ Demo
+![Demo](assets/demo.gif)
 ## ✨ Key Features
 
 - **Select Any Area**: Activate the extension by clicking its icon on any webpage, then drag your mouse to select the area you want to translate.

@@ -5,7 +5,9 @@
   --color-primary: #6200ee;
   --color-primary-variant: #3700b3;
   --color-secondary: #03dac6;
-  --color-background: #f5f5f5; /* 淺灰色背景 */
+  --color-background: #F8F7FA; /* 淺灰色背景，接近白色 */
+  --gradient-background: linear-gradient(160deg, #8B5CF6 0%, #C4B5FD 100%); /* 大膽的紫色漸層 */
+  --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F8F7FA 100%); /* 卡片用的白色到淺灰漸層 */
   --color-surface: #ffffff;    /* 卡片、對話框等的表面顏色 */
   --color-error: #b00020;
   --color-on-primary: #ffffff;
@@ -13,7 +15,7 @@
   --color-on-background: #000000;
   --color-on-surface: #000000;
   --color-on-error: #ffffff;
-  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-primary: rgba(255, 255, 255, .9);
   --color-text-secondary: rgba(0, 0, 0, 0.60);
   --color-divider: rgba(0, 0, 0, 0.12);
 
@@ -36,7 +38,7 @@
 }
 
 /* --- 全域重設與基礎樣式 --- */
-body {
+body.extension-body {
   margin: 0;
   font-family: var(--font-family);
   font-size: var(--font-size-body);
@@ -51,7 +53,7 @@ body {
   background-color: var(--color-surface);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-dp2);
-  padding: calc(var(--spacing-unit) * 2);
+  padding: calc(var(--spacing-unit) * 0.5);
 }
 
 /* 內含按鈕樣式 */
@@ -60,12 +62,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0 calc(var(--spacing-unit) * 2);
-  height: 36px;
+  height: 40px; /* 增加按鈕高度 */
   font-family: var(--font-family);
   font-size: var(--font-size-button);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.089em;
+  font-weight: 600; /* 加粗字體 */
+  text-transform: none; /* 移除大寫轉換 */
+  letter-spacing: normal; /* 正常字距 */
   color: var(--color-on-primary);
   background-color: var(--color-primary);
   border: none;
@@ -73,7 +75,7 @@ body {
   cursor: pointer;
   user-select: none;
   box-shadow: var(--shadow-dp2);
-  transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease-in-out;
 }
 
 .button:hover:not(:disabled) {
